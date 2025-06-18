@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -45,6 +47,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(nullable: true)]
     private ?bool $statut = null;
+
+    /**
+     * @var Collection<int, Visite>
+     */
+    #[ORM\OneToMany(targetEntity: Visite::class, mappedBy: 'guide')]
+    private Collection $visites;
+
+    public function __construct()
+    {
+        $this->visites = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -177,6 +190,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setStatut(?bool $statut): static
     {
         $this->statut = $statut;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Visite>
+     */
+    public function getVisites(): Collection
+    {
+        return $this->visites;
+    }
+
+    public function addVisite(Visite $visite): static
+    {
+        if (!$this->visites->contains($visite)) {
+            $this->visites->add($visite);
+            $visite->setGuide($this);
+        }
+
+        return $this;
+    }
+
+    public function removeVisite(Visite $visite): static
+    {
+        if ($this->visites->removeElement($visite)) {
+            // set the owning side to null (unless already changed)
+            if ($visite->getGuide() === $this) {
+                $visite->setGuide(null);
+            }
+        }
 
         return $this;
     }
