@@ -34,14 +34,14 @@ class Visite
     #[ORM\Column(type: Types::TIME_MUTABLE)]
     private ?\DateTime $heureDebut = null;
 
+    #[ORM\Column(type: Types::TIME_MUTABLE, nullable: true)]
+    private ?\DateTime $heureFin = null;
+
     #[ORM\Column]
     private ?float $duree = null;
 
     #[ORM\Column(type: Types::TEXT)]
     private ?string $commentaire = null;
-
-    #[ORM\Column]
-    private ?bool $statut = null;
 
     #[ORM\ManyToOne(inversedBy: 'visites')]
     #[ORM\JoinColumn(nullable: false)]
@@ -123,6 +123,15 @@ class Visite
         return $this;
     }
 
+    private function calculerHeureFin(): void
+    {
+    if ($this->heureDebut && $this->duree) {
+        $fin = clone $this->heureDebut;
+        $fin->modify("+{$this->duree} hour");
+        $this->heureFin = $fin;
+    }
+    }
+
     public function getHeureDebut(): ?\DateTime
     {
         return $this->heureDebut;
@@ -131,9 +140,23 @@ class Visite
     public function setHeureDebut(\DateTime $heureDebut): static
     {
         $this->heureDebut = $heureDebut;
+        $this->calculerHeureFin();
 
         return $this;
     }
+    
+    public function getHeureFin(): ?\DateTime
+    {
+    return $this->heureFin;
+    }
+
+    public function setHeureFin(?\DateTime $heureFin): static
+    {
+    $this->heureFin = $heureFin;
+
+    return $this;
+    }
+
 
     public function getDuree(): ?float
     {
@@ -143,7 +166,7 @@ class Visite
     public function setDuree(float $duree): static
     {
         $this->duree = $duree;
-
+        $this->calculerHeureFin();
         return $this;
     }
 
@@ -159,17 +182,6 @@ class Visite
         return $this;
     }
 
-    public function isStatut(): ?bool
-    {
-        return $this->statut;
-    }
-
-    public function setStatut(bool $statut): static
-    {
-        $this->statut = $statut;
-
-        return $this;
-    }
 
     public function getGuide(): ?User
     {

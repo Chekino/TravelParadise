@@ -251,4 +251,9 @@ public function setMainRole(?string $role): self
 
         return $this;
     }
+
+    public function __toString(): string
+{
+    return $this->prenom . ' ' . $this->nom; // Ou juste name() si tu préfères
+}
 }
