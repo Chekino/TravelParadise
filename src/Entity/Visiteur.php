@@ -94,4 +94,5 @@ class Visiteur
 
         return $this;
     }
+
 }

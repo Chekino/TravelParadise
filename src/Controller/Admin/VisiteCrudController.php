@@ -57,7 +57,7 @@ class VisiteCrudController extends AbstractCrudController
         return $crud
             ->setEntityLabelInSingular('Visite')
             ->setEntityLabelInPlural('Visites')
-            ->setPageTitle('index', 'Gestion des utilisateurs')
+            ->setPageTitle('index', 'Gestion des visites')
             ->setPageTitle('new', 'Créer une visite')
             ->setPageTitle('edit', 'Modifier la visite')
             ->setPageTitle('detail', 'Détails de la visite')

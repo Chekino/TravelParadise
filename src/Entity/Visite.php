@@ -224,4 +224,10 @@ class Visite
 
         return $this;
     }
+
+    public function __toString(): string
+    {
+    
+   return $this->id ? 'Visite #' . $this->titre : 'Nouvelle visite';
+    }
 }
