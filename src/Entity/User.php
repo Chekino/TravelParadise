@@ -110,6 +110,34 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+
+/**
+ * Méthode virtuelle pour EasyAdmin - récupère le premier rôle
+ */
+public function getMainRole(): ?string
+{
+    $roles = $this->getRoles();
+    return isset($roles[0]) ? $roles[0] : 'ROLE_USER';
+}
+
+/**
+ * Méthode virtuelle pour EasyAdmin - définit un seul rôle
+ */
+public function setMainRole(?string $role): self
+{
+    $this->roles = $role ? [$role] : ['ROLE_USER'];
+
+    // Automatiquement définir le statut à "actif" si c'est un guide
+    if ($role === 'ROLE_GUIDE' && $this->statut === null) {
+        $this->statut = 'actif';
+    }
+    // Effacer le statut si ce n'est plus un guide
+    elseif ($role !== 'ROLE_GUIDE') {
+        $this->statut = null;
+    }
+    return $this;
+}
+
     /**
      * @see PasswordAuthenticatedUserInterface
      */
