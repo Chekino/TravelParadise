@@ -9,7 +9,8 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
-
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 
 
 class VisiteurCrudController extends AbstractCrudController
@@ -47,5 +48,14 @@ class VisiteurCrudController extends AbstractCrudController
                 ]
             ]);
     }
+
+           public function configureActions(Actions $actions): Actions
+{
+    return $actions
+        ->update(Crud::PAGE_INDEX, Action::NEW, function (Action $action) {
+            return $action->setLabel('Ajouter visiteur');
+        });
+        
+}
     
 }

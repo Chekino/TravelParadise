@@ -1,9 +1,9 @@
 {% if visites is empty %}
-    <div class="alert alert-info">Aucune visite à afficher.</div>
+    <div class="alert alert-light border text-center">Aucune visite à afficher.</div>
 {% else %}
-    <div class="table-responsive">
-        <table class="table table-hover table-bordered align-middle">
-            <thead class="table-light">
+    <div class="table-responsive mt-3">
+        <table class="table table-bordered table-hover align-middle">
+            <thead class="table-success text-center">
                 <tr>
                     <th>#</th>
                     <th>Titre</th>
@@ -18,19 +18,12 @@
                     <tr>
                         <td>{{ loop.index }}</td>
                         <td><strong>{{ visite.titre }}</strong></td>
-                        <td>
-                            <span class="badge bg-secondary">{{ visite.lieu }}</span>
-                        </td>
-                        <td>
-                            <span class="badge bg-light text-dark">
-                                {{ visite.date|date('d/m/Y') }}
-                            </span>
-                        </td>
+                        <td><span class="badge bg-success-subtle text-dark">{{ visite.lieu }}</span></td>
+                        <td>{{ visite.date|date('d/m/Y') }}</td>
                         <td>{{ visite.heureDebut|date('H:i') }}</td>
                         <td>
-                            <a href="{{ path('guide_visite_detail', {id: visite.id}) }}"
-                               class="btn btn-sm btn-outline-primary">
-                                📄 Détails
+                            <a href="{{ path('guide_visite_detail', {id: visite.id}) }}" class="btn btn-outline-success btn-sm">
+                                📄 Infos
                             </a>
                         </td>
                     </tr>

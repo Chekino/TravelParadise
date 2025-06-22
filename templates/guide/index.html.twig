@@ -1,53 +1,45 @@
 {% extends 'base.html.twig' %}
+
 {% block title %}Mes visites{% endblock %}
 
 {% block body %}
 <div class="container mt-5">
-    <h1 class="mb-4 text-center">👨‍🏫 Tableau de bord du guide</h1>
-
-    <div class="d-flex justify-content-between align-items-center mb-3 px-2">
-        <div>
-            <strong>👤 Connecté en tant que :</strong>
-            {{ app.user.nom }} {{ app.user.prenom }}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="mb-0">Bonjour , <span >{{ app.user.nom }} {{ app.user.prenom }} </span></h1>
+        
+        <div class="text-end">
+            <a href="{{ path('app_logout') }}" class="btn btn-outline-danger btn-sm">Déconnexion</a>
         </div>
-        <a href="{{ path('app_logout') }}" class="btn btn-outline-danger btn-sm">🔓 Se déconnecter</a>
     </div>
 
-    <ul class="nav nav-pills justify-content-center mb-4" id="guideTabs" role="tablist">
-        <li class="nav-item">
-            <a class="nav-link active" id="avenir-tab" data-bs-toggle="pill" href="#avenir" role="tab">📅 À venir</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" id="encours-tab" data-bs-toggle="pill" href="#encours" role="tab">🟢 En cours</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" id="terminees-tab" data-bs-toggle="pill" href="#terminees" role="tab">✅ Terminées</a>
-        </li>
-    </ul>
-
-    <div class="tab-content">
-        <div class="tab-pane fade show active" id="avenir" role="tabpanel">
-            <div class="card shadow-sm border-0 mb-4">
+    <nav>
+        <div class="nav nav-tabs mb-4" id="nav-tab" role="tablist">
+            <button class="nav-link active" id="nav-avenir-tab" data-bs-toggle="tab" data-bs-target="#nav-avenir" type="button" role="tab">Programmer</button>
+            <button class="nav-link" id="nav-encours-tab" data-bs-toggle="tab" data-bs-target="#nav-encours" type="button" role="tab">En cours</button>
+            <button class="nav-link" id="nav-terminees-tab" data-bs-toggle="tab" data-bs-target="#nav-terminees" type="button" role="tab">Terminées</button>
+        </div>
+    </nav>
+    <div class="tab-content" id="nav-tabContent">
+        <div class="tab-pane fade show active" id="nav-avenir" role="tabpanel">
+            <div class="card border-info shadow-sm mb-4">
                 <div class="card-body">
-                    <h4 class="card-title text-info">📅 Visites à venir</h4>
+                    <h4 class="card-title text-info">Visites programmer</h4>
                     {% include 'guide/_table.html.twig' with {'visites': visites_avenir} %}
                 </div>
             </div>
         </div>
-
-        <div class="tab-pane fade" id="encours" role="tabpanel">
-            <div class="card shadow-sm border-0 mb-4">
+        <div class="tab-pane fade" id="nav-encours" role="tabpanel">
+            <div class="card border-warning shadow-sm mb-4">
                 <div class="card-body">
-                    <h4 class="card-title text-warning">🟢 Visites en cours</h4>
+                    <h4 class="card-title text-warning">Visites en cours</h4>
                     {% include 'guide/_table.html.twig' with {'visites': visites_encours} %}
                 </div>
             </div>
         </div>
-
-        <div class="tab-pane fade" id="terminees" role="tabpanel">
-            <div class="card shadow-sm border-0 mb-4">
+        <div class="tab-pane fade" id="nav-terminees" role="tabpanel">
+            <div class="card border-success shadow-sm mb-4">
                 <div class="card-body">
-                    <h4 class="card-title text-success">✅ Visites terminées</h4>
+                    <h4 class="card-title text-success"> Visites terminées</h4>
                     {% include 'guide/_table.html.twig' with {'visites': visites_terme} %}
                 </div>
             </div>

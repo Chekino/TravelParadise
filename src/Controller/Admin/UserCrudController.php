@@ -11,6 +11,8 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 
 class UserCrudController extends AbstractCrudController
 {
@@ -80,6 +82,15 @@ class UserCrudController extends AbstractCrudController
             ->setPageTitle('edit', 'Modifier l\'utilisateur')
             ->setPageTitle('detail', 'Détails de l\'utilisateur');
     }
+
+    public function configureActions(Actions $actions): Actions
+{
+    return $actions
+        ->update(Crud::PAGE_INDEX, Action::NEW, function (Action $action) {
+            return $action->setLabel('Ajouter utilisateur');
+        });
+        
+}
 
     public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {

@@ -15,7 +15,8 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
-
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 
 
 class VisiteCrudController extends AbstractCrudController
@@ -67,6 +68,15 @@ class VisiteCrudController extends AbstractCrudController
                 ]
             ]);
     }
+
+       public function configureActions(Actions $actions): Actions
+{
+    return $actions
+        ->update(Crud::PAGE_INDEX, Action::NEW, function (Action $action) {
+            return $action->setLabel('Ajouter visite');
+        });
+        
+}
 
     private function getGuides(): array
     {
