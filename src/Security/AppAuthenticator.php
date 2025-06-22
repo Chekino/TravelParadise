@@ -56,7 +56,7 @@ class AppAuthenticator extends AbstractLoginFormAuthenticator
        }
 
     // Redirection par défaut
-    return new RedirectResponse($this->urlGenerator->generate('app_home'));
+    return new RedirectResponse($this->urlGenerator->generate('app_login'));
    }
    public function getLoginUrl(Request $request): string
    {

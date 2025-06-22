@@ -1,0 +1,186 @@
+{% extends '@EasyAdmin/page/content.html.twig' %}
+
+{% block head_stylesheets %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content_title %}
+    <h1>Tableau de bord - TravelParadise</h1>
+{% endblock %}
+
+{% block main %}
+<div class="container px-4">
+    <div class="row g-4">
+        {# Statistiques principales #}
+        <div class="col-md-4">
+            <div class="card text-bg-primary shadow">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="card-title">Total visites {{ "now"|date("Y") }}</h5>
+                            <h2>{{ visitesParMois|reduce((total, item) => total + item.nombre) }}</h2>
+                        </div>
+                        <i class="fas fa-map-marked-alt fa-3x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card text-bg-success shadow">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="card-title">Visites ce mois</h5>
+                            <h2>{{ visitesParMois[("now"|date("n") - 1)].nombre ?? 0 }}</h2>
+                        </div>
+                        <i class="fas fa-calendar-alt fa-3x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card text-bg-info shadow">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="card-title">Moyenne mensuelle</h5>
+                            <h2>{{ (visitesParMois|reduce((total, item) => total + item.nombre) / 12)|round(1) }}</h2>
+                        </div>
+                        <i class="fas fa-chart-line fa-3x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Graphique #}
+    <div class="row mt-5">
+        <div class="col-md-12">
+            <div class="card shadow">
+                <div class="card-header text-white">
+                    <h4 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Nombre de visites par mois ({{ "now"|date("Y") }})</h4>
+                </div>
+                <div class="card-body">
+                    <canvas id="visitesChart" height="100"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Tableau des visites par guide et par mois #}
+    <div class="row mt-5">
+        <div class="col-md-12">
+            <div class="card shadow">
+                <div class="card-header bg-secondary text-white">
+                    <h4 class="mb-0"><i class="fas fa-users me-2"></i>Visites par guide et par mois</h4>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-striped table-hover mb-0">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Mois</th>
+                                <th>Guide</th>
+                                <th>Nombre de visites</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for mois, data in visitesParGuideParMois %}
+                                {% for guide, nb in data %}
+                                    <tr>
+                                        <td>{{ mois }}</td>
+                                        <td>{{ guide }}</td>
+                                        <td>{{ nb }}</td>
+                                    </tr>
+                                {% endfor %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+    </div>
+{% endblock %}
+
+{% block body_javascript %}
+    {{ parent() }}
+    <script>
+        // Données pour le graphique
+        const donnees = {{ visitesParMois|json_encode|raw }};
+        
+        // Configuration du graphique
+        const ctx = document.getElementById('visitesChart').getContext('2d');
+        const visitesChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: donnees.map(item => item.mois),
+                datasets: [{
+                    label: 'Nombre de visites',
+                    data: donnees.map(item => item.nombre),
+                    backgroundColor: [
+                        'rgba(54, 162, 235, 0.8)',
+                        'rgba(255, 99, 132, 0.8)',
+                        'rgba(255, 205, 86, 0.8)',
+                        'rgba(75, 192, 192, 0.8)',
+                        'rgba(153, 102, 255, 0.8)',
+                        'rgba(255, 159, 64, 0.8)',
+                        'rgba(199, 199, 199, 0.8)',
+                        'rgba(83, 102, 255, 0.8)',
+                        'rgba(255, 99, 255, 0.8)',
+                        'rgba(99, 255, 132, 0.8)',
+                        'rgba(255, 206, 99, 0.8)',
+                        'rgba(99, 206, 255, 0.8)'
+                    ],
+                    borderColor: [
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(255, 205, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)',
+                        'rgba(199, 199, 199, 1)',
+                        'rgba(83, 102, 255, 1)',
+                        'rgba(255, 99, 255, 1)',
+                        'rgba(99, 255, 132, 1)',
+                        'rgba(255, 206, 99, 1)',
+                        'rgba(99, 206, 255, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            title: function(context) {
+                                return context[0].label;
+                            },
+                            label: function(context) {
+                                return context.parsed.y + ' visite(s)';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+    </script>
+{% endblock %}

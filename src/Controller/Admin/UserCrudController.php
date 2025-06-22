@@ -3,19 +3,24 @@
 namespace App\Controller\Admin;
 
 use App\Entity\User;
-use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
-use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
-
-use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-
 
 class UserCrudController extends AbstractCrudController
 {
+    private UserPasswordHasherInterface $passwordHasher;
+
+    public function __construct(UserPasswordHasherInterface $passwordHasher)
+    {
+        $this->passwordHasher = $passwordHasher;
+    }
+
     public static function getEntityFqcn(): string
     {
         return User::class;
@@ -23,7 +28,6 @@ class UserCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
-        // Détection du rôle de l'utilisateur connecté
         $connectedUser = $this->getUser();
         $roles = $connectedUser ? $connectedUser->getRoles() : [];
 
@@ -41,23 +45,29 @@ class UserCrudController extends AbstractCrudController
             ];
         }
 
-        return [
+        $fields = [
             IdField::new('id')->onlyOnIndex(),
             TextField::new('email'),
             TextField::new('nom'),
             TextField::new('prenom'),
-            TextField::new('password')->hideOnIndex(),
             BooleanField::new('statut')->onlyOnIndex(),
-            
             TextField::new('paysAffectation')->hideOnIndex(),
             TextField::new('photo')->hideOnIndex(),
-            
             ChoiceField::new('mainRole')
                 ->setLabel('Rôle')
                 ->setChoices($roleChoices)
                 ->allowMultipleChoices(false)
                 ->renderExpanded(),
         ];
+
+        if (in_array($pageName, [Crud::PAGE_NEW, Crud::PAGE_EDIT])) {
+            $fields[] = TextField::new('password')
+                ->setLabel('Mot de passe')
+                ->setFormTypeOption('mapped', true)
+                ->setRequired($pageName === Crud::PAGE_NEW);
+        }
+
+        return $fields;
     }
 
     public function configureCrud(Crud $crud): Crud
@@ -68,25 +78,24 @@ class UserCrudController extends AbstractCrudController
             ->setPageTitle('index', 'Gestion des utilisateurs')
             ->setPageTitle('new', 'Créer un utilisateur')
             ->setPageTitle('edit', 'Modifier l\'utilisateur')
-            ->setPageTitle('detail', 'Détails de l\'utilisateur')
-            ->setFormOptions([
-                'attr' => [
-                    'data-controller' => 'role-dependent-fields'
-                ]
-            ]);
+            ->setPageTitle('detail', 'Détails de l\'utilisateur');
     }
 
     public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
         /** @var User $user */
         $user = $entityInstance;
-        
-        // Convertir le rôle principal en array
+
+        if ($user->getPassword()) {
+            $hashedPassword = $this->passwordHasher->hashPassword($user, $user->getPassword());
+            $user->setPassword($hashedPassword);
+        }
+
         if ($user->getMainRole()) {
             $user->setRoles([$user->getMainRole()]);
         }
 
-        parent::persistEntity($entityManager, $entityInstance);
+        parent::persistEntity($entityManager, $user);
     }
 
     public function updateEntity(EntityManagerInterface $entityManager, $entityInstance): void
@@ -94,17 +103,15 @@ class UserCrudController extends AbstractCrudController
         /** @var User $user */
         $user = $entityInstance;
 
-        // Hasher le mot de passe seulement si un nouveau mot de passe a été fourni
         if ($user->getPassword()) {
             $hashedPassword = $this->passwordHasher->hashPassword($user, $user->getPassword());
             $user->setPassword($hashedPassword);
         }
-        
-        // Convertir le rôle principal en array
+
         if ($user->getMainRole()) {
             $user->setRoles([$user->getMainRole()]);
         }
 
-        parent::updateEntity($entityManager, $entityInstance);
+        parent::updateEntity($entityManager, $user);
     }
 }

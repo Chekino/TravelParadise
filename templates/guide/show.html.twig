@@ -1,0 +1,103 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détails de la visite{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <h1 class="mb-4">Appel des visiteurs</h1>
+
+    <h4>Visite : {{ visite.titre }}</h4>
+    <p><strong>Lieu :</strong> {{ visite.lieu }}</p>
+    <p><strong>Date :</strong> {{ visite.date|date('d/m/Y') }} à {{ visite.heureDebut|date('H:i') }}</p>
+{% set now = "now"|date("U") %}
+{% set date = visite.date|date("Y-m-d") %}
+{% set dateToday = "now"|date("Y-m-d") %}
+{% set heureDebut = visite.heureDebut|date("H:i") %}
+{% set heureFin = visite.heureFin|date("H:i") %}
+{% set heureNow = "now"|date("H:i") %}
+
+{% if visite.commentaireFinal %}
+    <span class="badge bg-success">✅ Visite terminée</span>
+{% elseif date == dateToday and heureDebut <= heureNow and heureNow < heureFin %}
+    <span class="badge bg-warning text-dark">🟢 Visite en cours</span>
+{% elseif date > dateToday or (date == dateToday and heureDebut > heureNow) %}
+    <span class="badge bg-info text-dark">📅 Visite à venir</span>
+{% else %}
+    <span class="badge bg-secondary">⚪ Statut inconnu</span>
+{% endif %}
+{% if visite.commentaireFinal is null %}
+    <form method="post">
+        <table class="table table-bordered mt-4">
+            <thead>
+                <tr>
+                    <th>Nom</th>
+                    <th>Prénom</th>
+                    <th>Présent</th>
+                    <th>Commentaire</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for visiteur in visiteurs %}
+                <tr>
+                    <td>{{ visiteur.nom }}</td>
+                    <td>{{ visiteur.prenom }}</td>
+                    <td>
+                        <select name="present_{{ visiteur.id }}" class="form-select">
+                            <option value="oui" {% if visiteur.present %}selected{% endif %}>Oui</option>
+                            <option value="non" {% if visiteur.present == false %}selected{% endif %}>Non</option>
+                        </select>
+                    </td>
+                    <td>
+                        <input type="text" name="commentaire_{{ visiteur.id }}" value="{{ visiteur.commentaire }}" class="form-control">
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="mt-4">
+            <label for="commentaire_final" class="form-label">Commentaire de fin de visite :</label>
+            <textarea name="commentaire_final" id="commentaire_final" rows="4" class="form-control">{{ visite.commentaireFinal }}</textarea>
+        </div>
+
+        <button type="submit" class="btn btn-success mt-4">Enregistrer et clôturer la visite</button>
+        <a href="{{ path('guide_dashboard') }}" class="btn btn-secondary mt-4">Retour</a>
+    </form>
+{% else %}
+    <table class="table table-bordered mt-4">
+        <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Prénom</th>
+                <th>Présent</th>
+                <th>Commentaire</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for visiteur in visiteurs %}
+            <tr>
+                <td>{{ visiteur.nom }}</td>
+                <td>{{ visiteur.prenom }}</td>
+                <td>
+                    {% if visiteur.present %}
+                        <span class="badge bg-success">Oui</span>
+                    {% else %}
+                        <span class="badge bg-danger">Non</span>
+                    {% endif %}
+                </td>
+                <td>{{ visiteur.commentaire }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="mt-4">
+        <h4>📝 Commentaire final :</h4>
+        <p>{{ visite.commentaireFinal }}</p>
+    </div>
+
+    <a href="{{ path('guide_dashboard') }}" class="btn btn-secondary mt-4">Retour</a>
+{% endif %}
+
+</div>
+{% endblock %}

@@ -5,6 +5,9 @@ namespace App\Entity;
 use App\Repository\VisiteurRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
+
 
 #[ORM\Entity(repositoryClass: VisiteurRepository::class)]
 class Visiteur
@@ -94,5 +97,20 @@ class Visiteur
 
         return $this;
     }
+
+    #[Assert\Callback]
+public function validateNombreDeVisiteurs(ExecutionContextInterface $context): void
+{
+    if (!$this->visite) {
+        return;
+    }
+
+    // Vérifie s’il y a déjà 15 visiteurs
+    if (count($this->visite->getVisiteurs()) >= 15 && !$this->visite->getVisiteurs()->contains($this)) {
+        $context->buildViolation('Cette visite a déjà atteint le nombre maximal de 15 visiteurs.')
+            ->atPath('visite')
+            ->addViolation();
+    }
+}
 
 }

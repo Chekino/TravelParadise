@@ -1,0 +1,144 @@
+{% extends '@EasyAdmin/page/content.html.twig' %} {% block head_stylesheets %}
+{{ parent() }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %} {% block content_title %}
+<h1 class="text-center text-uppercase mb-4">Statistiques - TravelParadise</h1>
+{% endblock %} {% block main %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="alert alert-info text-center fs-5 shadow-sm">
+                📊 Suivi des visites touristiques sur l'année
+                <strong>{{ "now"|date("Y") }}</strong>
+            </div>
+        </div>
+    </div>
+
+    {# Stats cartes horizontales #}
+    <div class="row g-3 mb-4 text-center">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title">🌍 Total visites</h5>
+                    <h2 class="text-primary">
+                        {{ visitesParMois|reduce((total, item) => total + item.nombre) }}
+                    </h2>
+                    <p class="text-muted">Depuis janvier</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title">📆 Ce mois</h5>
+                    <h2 class="text-success">
+                        {{ visitesParMois[("now"|date("n") - 1)].nombre ?? 0 }}
+                    </h2>
+                    <p class="text-muted">{{ "now"|date("F")|capitalize }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title">📈 Moyenne mensuelle</h5>
+                    <h2 class="text-info">
+                        {{ (visitesParMois|reduce((total, item) => total + item.nombre) / 12)|round(1) }}
+                    </h2>
+                    <p class="text-muted">Basée sur 12 mois</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Ligne Chart.js #}
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-gradient text-white bg-primary">
+                    <h4 class="mb-0">📊 Évolution mensuelle des visites</h4>
+                </div>
+                <div class="card-body">
+                    <canvas id="lineChartVisites" height="90"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Tableau des visites par guide #}
+    <div class="row mt-5">
+        <div class="col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-secondary text-white">
+                    <h4 class="mb-0">Visites par guide et par mois</h4>
+                </div>
+                <div
+                    class="card-body p-0"
+                    style="max-height: 400px; overflow-y: auto"
+                >
+                    <table
+                        class="table table-sm table-striped table-hover mb-0"
+                    >
+                        <thead class="table-dark sticky-top">
+                            <tr>
+                                <th scope="col">Mois</th>
+                                <th scope="col">Guide</th>
+                                <th scope="col">Nombre de visites</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for mois, data in visitesParGuideParMois %} {%
+                            for guide, nb in data %}
+                            <tr>
+                                <td>{{ mois }}</td>
+                                <td>{{ guide }}</td>
+                                <td>{{ nb }}</td>
+                            </tr>
+                            {% endfor %} {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} {% block body_javascript %}
+{{ parent() }}
+<script>
+    const stats = {{ visitesParMois|json_encode|raw }};
+    const ctx = document.getElementById('lineChartVisites').getContext('2d');
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: stats.map(item => item.mois),
+            datasets: [{
+                label: 'Visites',
+                data: stats.map(item => item.nombre),
+                fill: true,
+                backgroundColor: 'rgba(54, 162, 235, 0.1)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                tension: 0.3,
+                pointBackgroundColor: 'rgba(54, 162, 235, 1)'
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: ctx => `${ctx.parsed.y} visite(s)`
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { stepSize: 1 }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

@@ -14,6 +14,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
 
 
 
@@ -47,9 +48,8 @@ class VisiteCrudController extends AbstractCrudController
             NumberField::new('duree')->setLabel('Durée en heure'),
             TextareaField::new('commentaire')->hideOnIndex(),
             
-
-            
         ];
+
     }
 
     public function configureCrud(Crud $crud): Crud

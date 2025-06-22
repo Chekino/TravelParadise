@@ -1,20 +1,57 @@
 {% extends 'base.html.twig' %}
-
-{% block title %}Hello GuideController!{% endblock %}
+{% block title %}Mes visites{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+<div class="container mt-5">
+    <h1 class="mb-4 text-center">👨‍🏫 Tableau de bord du guide</h1>
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
+    <div class="d-flex justify-content-between align-items-center mb-3 px-2">
+        <div>
+            <strong>👤 Connecté en tant que :</strong>
+            {{ app.user.nom }} {{ app.user.prenom }}
+        </div>
+        <a href="{{ path('app_logout') }}" class="btn btn-outline-danger btn-sm">🔓 Se déconnecter</a>
+    </div>
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>C:/Users/D. Cheikh Ahmad T/Desktop/Work/TravelParadise_EcoleIt/travelParadise/travelparadise/src/Controller/GuideController.php</code></li>
-        <li>Your template at <code>C:/Users/D. Cheikh Ahmad T/Desktop/Work/TravelParadise_EcoleIt/travelParadise/travelparadise/templates/guide/index.html.twig</code></li>
+    <ul class="nav nav-pills justify-content-center mb-4" id="guideTabs" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" id="avenir-tab" data-bs-toggle="pill" href="#avenir" role="tab">📅 À venir</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="encours-tab" data-bs-toggle="pill" href="#encours" role="tab">🟢 En cours</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="terminees-tab" data-bs-toggle="pill" href="#terminees" role="tab">✅ Terminées</a>
+        </li>
     </ul>
+
+    <div class="tab-content">
+        <div class="tab-pane fade show active" id="avenir" role="tabpanel">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body">
+                    <h4 class="card-title text-info">📅 Visites à venir</h4>
+                    {% include 'guide/_table.html.twig' with {'visites': visites_avenir} %}
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="encours" role="tabpanel">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body">
+                    <h4 class="card-title text-warning">🟢 Visites en cours</h4>
+                    {% include 'guide/_table.html.twig' with {'visites': visites_encours} %}
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="terminees" role="tabpanel">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body">
+                    <h4 class="card-title text-success">✅ Visites terminées</h4>
+                    {% include 'guide/_table.html.twig' with {'visites': visites_terme} %}
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

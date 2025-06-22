@@ -43,6 +43,10 @@ class Visite
     #[ORM\Column(type: Types::TEXT)]
     private ?string $commentaire = null;
 
+    #[ORM\Column(type: 'text', nullable: true)]
+private ?string $commentaireFinal = null;
+
+
     #[ORM\ManyToOne(inversedBy: 'visites')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $guide = null;
@@ -216,7 +220,6 @@ class Visite
     public function removeVisiteur(Visiteur $visiteur): static
     {
         if ($this->visiteurs->removeElement($visiteur)) {
-            // set the owning side to null (unless already changed)
             if ($visiteur->getVisite() === $this) {
                 $visiteur->setVisite(null);
             }
@@ -230,4 +233,17 @@ class Visite
     
    return $this->id ? 'Visite #' . $this->titre : 'Nouvelle visite';
     }
+
+    public function getCommentaireFinal(): ?string
+{
+    return $this->commentaireFinal;
+}
+
+public function setCommentaireFinal(?string $commentaireFinal): static
+{
+    $this->commentaireFinal = $commentaireFinal;
+
+    return $this;
+}
+
 }

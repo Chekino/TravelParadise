@@ -17,10 +17,11 @@ security:
             lazy: true
             provider: app_user_provider
             custom_authenticator: App\Security\AppAuthenticator
+
             logout:
                 path: app_logout
                 # where to redirect after logout
-                # target: app_any_route
+                target: /login
 
             remember_me:
                 secret: "%kernel.secret%"
@@ -40,9 +41,7 @@ security:
     # Note: Only the *first* access control that matches will be used
     access_control:
         - { path: ^/admin, roles: [ROLE_ADMIN, ROLE_USER] }
-        - { path: ^/user, roles: ROLE_USER }
         - { path: ^/guide, roles: ROLE_GUIDE }
-        - { path: ^/login, roles: PUBLIC_ACCESS }
 
 when@test:
     security:
